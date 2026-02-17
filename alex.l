@@ -115,8 +115,8 @@ int yywrap()
 in the C program.
 Input Source Program: (sample.c)
 #define PI 3.14
-#include&lt;stdio.h&gt;
-#include&lt;conio.h&gt;
+#include<stdio.h>;
+#include<conio.h>;
 void main()
 {
 int a,b,c = 30;
@@ -124,6 +124,40 @@ printf(&quot;hello&quot;);
 }
 
 Lex program:
+%{
+#include <stdio.h>
+
+int macro_count = 0;
+int header_count = 0;
+%}
+
+%%
+^#define     { macro_count++; }
+
+^#include    { header_count++; }
+
+[ \t\n]+      ;   /* Ignore spaces */
+
+.             ;   /* Ignore other characters */
+%%
+
+int main(int argc, char *argv[])
+{
+    if(argc > 1)
+        yyin = fopen(argv[1], "r");
+
+    yylex();
+
+    printf("\nNumber of Macros Defined = %d\n", macro_count);
+    printf("Number of Header Files Included = %d\n", header_count);
+
+    return 0;
+}
+
+int yywrap()
+{
+    return 1;
+}
 
   
 19. Write a LEX program to print all HTML tags in the input file.
